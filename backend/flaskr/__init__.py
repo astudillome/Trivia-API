@@ -34,7 +34,7 @@ def create_app(test_config=None):
   '''
   @app.after_request
   def after_request(response):
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Teype,Authorization,true')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,true')
         response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
         return response
   '''
@@ -45,14 +45,16 @@ def create_app(test_config=None):
   @app.route('/categories', methods=['GET'])
   def get_categories():
         categories = Category.query.order_by(Category.id).all()
-        
+        category_dict = {}
+        for category in categories:
+              category_dict[category.id] = category.type
         if len(categories) == 0:
               abort(404)
               
         return jsonify({
           'success': True,
-          'categories': categories,
-          'total_categories': len(categories)
+          'categories': category_dict,
+          'total_categories': len(category_dict)
         })
 
   '''
@@ -72,6 +74,11 @@ def create_app(test_config=None):
   def get_questions():
         selection = Question.query.order_by(Question.id).all()
         current_questions = paginate_questions(request, selection)
+        categories = Category.query.order_by(Category.id).all()
+        category_dict = {}
+        for category in categories:
+              category_dict[category.id] = category.type
+        
         
         if len(current_questions) == 0:
               abort(404)
@@ -79,7 +86,9 @@ def create_app(test_config=None):
         return jsonify({
           'success': True,
           "questions": current_questions,
-          'total_questions': len(selection)
+          'total_questions': len(selection),
+          'categories': category_dict,
+          'current_category': None
         })
   '''
   @TODO: 
