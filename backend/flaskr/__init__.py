@@ -181,7 +181,8 @@ def create_app(test_config=None):
                     'success': True,
                     "status": 200,
                     'questions': paginate_questions(request, selection),
-                    'total_questions': len(selection)
+                    'total_questions': len(selection),
+                    'current_category': None
               })
         except:
               abort(422)
