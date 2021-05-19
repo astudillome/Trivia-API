@@ -21,3 +21,5 @@ package-lock.json
 /build
 npm-debug.log*
 node_modules/
+venv/
+/venv
