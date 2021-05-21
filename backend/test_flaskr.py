@@ -28,6 +28,53 @@ class TriviaTestCase(unittest.TestCase):
     def tearDown(self):
         """Executed after reach test"""
         pass
+    
+    def test_get_paginated_questions(self):
+        res = self.client().get('/questions')
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['current_category'], None)
+        self.assertTrue(len(data['questions']))
+        self.assertTrue(data['total_questions'])
+        self.assertTrue(data['categories'])
+    
+    # def test_404_sent_requesting_beyond_valid_page(self):
+    #     res = self.client().get('/questions?page=1000', json={'category': 1})
+    #     data = json.loads(res.data)
+        
+    #     self.assertEqual(res.status_code, 404)
+    #     self.assertEqual(data['success'], False)
+    #     self.assertEqual(data['message'], 'resource not found')
+    
+    def test_add_question(self):
+        res = self.client().post('/questions', json={
+            'question': "Who's on first?",
+            'answer': "Who",
+            'category': 5,
+            'difficulty': 3})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['created'])
+        self.assertTrue(len(data['questions']))
+        self.assertTrue(data['total_questions'])
+    
+    def test_delete_question(self):
+        res = self.client().delete('/questions/24')
+        data = json.loads(res.data)
+        
+        question = Question.query.filter(Question.id == 24).one_or_none()
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['deleted'], 24)
+        self.assertEqual(question, None)
+    
+    
+
 
     """
     TODO

@@ -3,11 +3,9 @@ from flask import Flask, request, abort, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
 import random
-
 from models import setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
-
 
 def paginate_questions(request, selection):
     page = request.args.get('page', 1, type=int)
@@ -18,7 +16,6 @@ def paginate_questions(request, selection):
     current_questions = questions[start:end]
 
     return current_questions
-
 
 def create_app(test_config=None):
     # create and configure the app
@@ -141,8 +138,7 @@ def create_app(test_config=None):
             new_category = body.get('category', None)
             new_difficulty = body.get('difficulty', None)
 
-            question = Question(question=new_question, answer=new_answer,
-                                category=new_category, difficulty=new_difficulty)
+            question = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
             question.insert()
 
             selection = Question.query.order_by(Question.id).all()
@@ -261,6 +257,14 @@ def create_app(test_config=None):
   Create error handlers for all expected errors 
   including 404 and 422. 
   '''
+    @app.errorhandler(400)
+    def bad_request(error):
+        return jsonify({
+            'success': False,
+            'error': 400,
+            'message': 'Bad request.'
+        })
+
     @app.errorhandler(404)
     def not_found(error):
         return jsonify({
@@ -268,13 +272,21 @@ def create_app(test_config=None):
             'error': 404,
             'message': 'Resource not found'
         })
-
+     
     @app.errorhandler(422)
     def unprocessable(error):
         return jsonify({
             'success': False,
             'error': 422,
             'message': 'Unprocessable'
+        })
+
+    @app.errorhandler(500)
+    def internal_server_error(error):
+        return jsonify({
+            'success': False,
+            'error': 500,
+            'message': 'Internal server error.'
         })
 
     return app
