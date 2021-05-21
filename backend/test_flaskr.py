@@ -28,6 +28,23 @@ class TriviaTestCase(unittest.TestCase):
     def tearDown(self):
         """Executed after reach test"""
         pass
+    def test_get_categories(self):
+        res = self.client().get('/categories')
+        data = json.loads(res.data)
+        
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['categories'])
+        self.assertTrue(data['total_categories'])
+        
+    def test_404_get_categories_error(self):
+        res = self.client().get('/categories/100')
+        data = json.loads(res.data)
+        
+        self.assertEqual(res.status_code, 404)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['total_categories'], 0)
+        self.assertEqual(data['message'], 'Resource Not Found')
     
     def test_get_paginated_questions(self):
         res = self.client().get('/questions')
@@ -46,7 +63,7 @@ class TriviaTestCase(unittest.TestCase):
         
     #     self.assertEqual(res.status_code, 404)
     #     self.assertEqual(data['success'], False)
-    #     self.assertEqual(data['message'], 'resource not found')
+    #     self.assertEqual(data['message'], 'Resource Not Found')
     
     def test_add_question(self):
         res = self.client().post('/questions', json={
@@ -62,18 +79,43 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(len(data['questions']))
         self.assertTrue(data['total_questions'])
     
-    def test_delete_question(self):
-        res = self.client().delete('/questions/24')
+    # def test_delete_question(self):
+    #     res = self.client().delete('/questions/25')
+    #     data = json.loads(res.data)
+        
+    #     question = Question.query.filter(Question.id == 25).one_or_none()
+
+    #     self.assertEqual(res.status_code, 200)
+    #     self.assertEqual(data['success'], True)
+    #     self.assertEqual(data['deleted'], 25)
+    #     self.assertEqual(question, None)
+    
+    def test_get_questions_from_search(self):
+        res = self.client().post('/questions/search', json={'searchTerm': 'rice'})
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status, '200 OK')
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['total_questions'])
+        self.assertEqual(len(data['questions']), 1)
+        
+    def test_get_questions_by_category(self):
+        res = self.client().get('/categories/1/questions')
         data = json.loads(res.data)
         
-        question = Question.query.filter(Question.id == 24).one_or_none()
-
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(data['deleted'], 24)
-        self.assertEqual(question, None)
+        self.assertTrue(data['questions'])
+        self.assertTrue(data['total_questions'])
+        self.assertEqual(data['current_category'], {'id': 1, 'type': 'Science'})
     
-    
+    def test_quizzes_play(self):
+        res = self.client().post('/quizzes', json={'previous_questions': ['2'], 'quiz_category': {'type': 'Science', 'id': 1}})
+        data = json.loads(res.data)
+        
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['question'])
 
 
     """
