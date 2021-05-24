@@ -133,10 +133,10 @@ def create_app(test_config=None):
     def add_question():
         body = request.get_json()
         try:
-            new_question = body.get('question', None)
-            new_answer = body.get('answer', None)
-            new_category = body.get('category', None)
-            new_difficulty = body.get('difficulty', None)
+            new_question = body.get('question')
+            new_answer = body.get('answer')
+            new_category = body.get('category')
+            new_difficulty = body.get('difficulty')
 
             question = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
             question.insert()
@@ -229,7 +229,7 @@ def create_app(test_config=None):
     def get_quiz_question():
         body = request.get_json()
         previous_questions = body.get('previous_questions', [])
-        quiz_category = body.get('quiz_category', None)
+        quiz_category = body.get('quiz_category')
         if not quiz_category:
             abort(422)
 
