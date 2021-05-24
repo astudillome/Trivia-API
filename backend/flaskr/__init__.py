@@ -201,11 +201,11 @@ def create_app(test_config=None):
     def get_questions_by_category(category_id):
         category = Category.query.filter_by(id=category_id).first()
         if not category:
-            abort(422)
+            abort(404)
 
         selection = Question.query.filter_by(category=str(category_id)).all()
         if not selection:
-            abort(422)
+            abort(404)
 
         return jsonify({
             'success': True,
@@ -263,15 +263,15 @@ def create_app(test_config=None):
             'success': False,
             'error': 400,
             'message': 'Bad request.'
-        })
+        }, 400)
 
     @app.errorhandler(404)
     def not_found(error):
         return jsonify({
             'success': False,
             'error': 404,
-            'message': 'Resource not found'
-        })
+            'message': 'Resource not found.'
+        }, 404)
      
     @app.errorhandler(422)
     def unprocessable(error):
@@ -279,7 +279,7 @@ def create_app(test_config=None):
             'success': False,
             'error': 422,
             'message': 'Unprocessable'
-        })
+        }, 422)
 
     @app.errorhandler(500)
     def internal_server_error(error):
@@ -287,6 +287,6 @@ def create_app(test_config=None):
             'success': False,
             'error': 500,
             'message': 'Internal server error.'
-        })
+        }, 500)
 
     return app
